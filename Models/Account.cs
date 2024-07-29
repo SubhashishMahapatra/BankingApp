@@ -47,7 +47,7 @@ namespace BankAppUsingList.Models
         
         public static void Transactions(ref List<Account> accounts )
         {
-            accounts = SerializationDeserialization.Deserialization();
+            //accounts = SerializationDeserialization.Deserialization();
 
             Account transaction = new Account();
 
@@ -73,9 +73,10 @@ namespace BankAppUsingList.Models
         {
             bool exit = true;
 
-
+            int flag = 1;
             while (accNum == account.AccountNumber && exit)
             {
+                flag = 0;
                 Console.WriteLine();
                 Console.WriteLine("Welcome " + account.AccountHolderName);
                 Console.WriteLine("-------------------------------");
@@ -99,6 +100,11 @@ namespace BankAppUsingList.Models
                         break;
 
                 }
+            }
+
+            if (flag == 1)
+            {
+                Console.WriteLine("Account Not Found");
             }
         }
 
