@@ -1,205 +1,162 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace BankAppUsingList.Models
 {
-    internal class BankManager
-    {        
-        public static void StartApp() //Account[] account --> for an Array
+    internal class Account
+    {
+        public const int LIMIT_BALANCE = 500;
+        public string BankName {  get; set; }
+        public int AccountNumber {  get; set; }
+        public string AccountHolderName { get; set; }
+
+        public double AccountBalance { get; set; }
+
+        public long AadharNumber {  get; set; }
+
+        public Account() 
         {
-            List<Account> account = new List<Account>();  // Creation of a List
 
-            account = SerializationDeserialization.Deserialization();
-            
-            bool programRunning = true;
-            Console.WriteLine("Welcome To Banking App");
-            Console.WriteLine("----------------------------------------------------------------------------------------");
-            Console.WriteLine("Select an Options Below");
-            while (programRunning)
+        }
+        public Account(string bankName, string accountHolderName, int accountNumber, double accountBalance, long aadharNumber) 
+        {
+            BankName = bankName;
+            AccountNumber = accountNumber;
+            AccountHolderName = accountHolderName;
+            AccountBalance = accountBalance;
+            AadharNumber = aadharNumber;
+
+            if (AccountBalance < LIMIT_BALANCE)
             {
-                
-                Console.WriteLine();
-                Console.WriteLine($"{"1. Create New Account"} | {"2. Work with an Existing account"} | {"3. Exit App"} ");
-                int choose = int.Parse(Console.ReadLine());
+                Console.WriteLine("Balance Can't be below 500, Hence updated to Limit Balance");
+                AccountBalance = LIMIT_BALANCE;
+            }
+            else 
+            {
+                AccountBalance = accountBalance;
+            }
+            
 
-                switch (choose)
+        }
+        
+
+        
+        public static void Transactions(ref List<Account> accounts )
+        {
+            //accounts = SerializationDeserialization.Deserialization();
+
+            Account transaction = new Account();
+
+            Console.WriteLine("Enter Your Account Number: ");
+            int accNumber = int.Parse(Console.ReadLine());
+
+
+            if (accounts.Count == 0)
+            {
+                Console.WriteLine("Account Does not Exist, You need to Add an Account First");
+                
+            }
+            else
+            {
+                foreach (Account account in accounts)
+                {
+                    transaction.TransactionMenu(account, accNumber);
+                }
+            }
+        }
+
+        public void TransactionMenu(Account account, int accNum)
+        {
+            bool exit = true;
+
+            int flag = 1;
+            while (accNum == account.AccountNumber && exit)
+            {
+                flag = 0;
+                Console.WriteLine();
+                Console.WriteLine("Welcome " + account.AccountHolderName);
+                Console.WriteLine("-------------------------------");
+
+                Console.WriteLine("1. Deposit 2. Withdraw 3. Account Details 4. Go to the previous menu");
+                int choice = int.Parse(Console.ReadLine());
+
+                switch (choice)
                 {
                     case 1:
-                        
-                        AddAccount(ref account);
+                        account.Deposit();
                         break;
-
                     case 2:
-
-                        ExistingAccount(ref account);
+                        account.Withdraw();
                         break;
                     case 3:
-
-                        programRunning = false;
-                        Console.WriteLine("-----------------------------------------------");
-                        Console.WriteLine("Thank for Using Banking App!, Have a nice day :)");
-                        Console.WriteLine("-----------------------------------------------");
-
+                        account.AccountDetails();
                         break;
-                }
+                    case 4:
+                        exit = false;
+                        break;
 
-            }
-
-            static void AddAccount(ref List<Account> account)
-            {
-                Console.WriteLine();
-                Console.WriteLine("Enter All Your Details Properly to Add an Account");
-                Console.WriteLine("----------------------------------------------------------------------------------------");
-
-
-                Console.Write("Enter Your Bank Name: ");
-                string bankName = Console.ReadLine();
-                Console.Write("Enter Account Holder Name: ");
-                string accountHolderName = Console.ReadLine();
-                Console.Write("Enter Account Number: ");
-                int accountNumber = int.Parse(Console.ReadLine());
-                Console.Write("Enter the Balance You want to Add: ");
-                double accountBalance = double.Parse(Console.ReadLine());
-                Console.Write("Enter Your Aadhar Number: ");
-                long aadharNumber = long.Parse(Console.ReadLine());
-
-                Console.WriteLine("Congratulations!..Your Account has been Added Successfully!");
-
-                Account newAccount = new Account(bankName, accountHolderName, accountNumber, accountBalance, aadharNumber);
-                account.Add(newAccount);
-                SerializationDeserialization.Serialization(account);
-            }
-
-
-            static void ExistingAccount(ref List<Account> account)
-            {
-         
-                bool programmingRunning = true;
-
-                while (programmingRunning)
-                {
-                    Console.WriteLine("----------------------------------------------------------------------------------------");
-                    Console.WriteLine($"| {"1. Update your Account"} | {"2. View or Initiate Transactions"} |  {"3. Remove Your Account"} | {"4. Go to Main Menu"}");
-                    int choose = int.Parse(Console.ReadLine());
-
-                    switch (choose)
-                    {
-                        case 1:
-                            UpdateAccountDetails(ref account);
-                            break;
-                        case 2:
-                            Account.Transactions(ref account);
-                            break;
-                        case 3:
-                            RemoveAccount(ref account);
-                            break;
-                        case 4:
-                            programmingRunning = false;
-                            break;
-                    }
                 }
             }
 
-            
-            
-
-            static void UpdateAccountDetails(ref List<Account> accounts)
+            if (flag == 1)
             {
-
-                Console.Write("Enter the account number you want to Edit: ");
-                int accNumber = int.Parse(Console.ReadLine());
-                int iterator = 0;
-                if (accounts.Count == 0)
-                {
-                    Console.WriteLine("System Doesn't Contain any account, You have to Add before Updating.");
-                    Console.WriteLine("Go to the Previous Menu and Create a new one.");
-                }
-                else
-                {
-                    foreach (Account account in accounts)
-                    {
-
-
-                        if (account.AccountNumber == accNumber)
-                        {
-                            Console.WriteLine("Welcome " + account.AccountHolderName);
-                            Console.WriteLine("Edit your Details Below");
-
-                            Console.Write("Enter Your Bank Name: ");
-                            string bankName = Console.ReadLine();
-                            Console.Write("Enter Account Holder Name: ");
-                            string accountHolderName = Console.ReadLine();
-                            //Console.Write("Enter Account Number: ");
-                            //int accountNumber = int.Parse(Console.ReadLine());
-                            //Console.Write("Enter the Balance You want to Add: ");
-                            //double accountBalance = double.Parse(Console.ReadLine());
-                            Console.Write("Enter Your Aadhar Number: ");
-                            long aadharNumber = long.Parse(Console.ReadLine());
-
-                            
-
-
-                            Account newAccount = new Account(bankName, accountHolderName, account.AccountNumber, account.AccountBalance, aadharNumber);
-
-                            accounts[iterator] = newAccount;
-                            SerializationDeserialization.Serialization(accounts);
-                            Console.WriteLine("Account Updated Successfully!");
-                            break;
-
-                            
-
-                        }
-                        else
-                        {
-                            Console.WriteLine("Account Not Found");
-                        }
-
-                        iterator++;
-                    }
-
-                }
-                
+                Console.WriteLine("Account Not Found");
             }
+        }
 
 
+        public double Deposit()
+        {
+            Console.Write("Enter the amount you want to deposit: ");
+            double dep = int.Parse(Console.ReadLine());
+            AccountBalance += dep;
+            Console.WriteLine("Amount has been deposited");
+            Console.WriteLine("Cuurent Account Balance : "+AccountBalance);
+            return AccountBalance;
+        }
 
-            static void RemoveAccount(ref List<Account> accounts)
+        public double Withdraw()
+        {
+            Console.WriteLine("Enter the amount you want to withdraw: ");
+            double withdraw = int.Parse(Console.ReadLine());
+
+            if (AccountBalance  - withdraw < LIMIT_BALANCE )
             {
-                int flag = 0;
-                Console.WriteLine("Enter Account Number that needs to be removed: ");
-                int accNumber = int.Parse(Console.ReadLine());
+                Console.WriteLine("Insufficient Amount to withdraw!");
+            }
+            else 
+            {
+                AccountBalance -= withdraw;
+                Console.WriteLine("Amount Withdrawn Successfully!");
+                Console.WriteLine("Current Balance left is: "+AccountBalance);
 
-                Account foundAccount = null;
-                foreach(Account account in accounts)
-                {
-                    if (account.AccountNumber == accNumber) 
-                    {
-                        foundAccount = account; 
-                        flag = 1;
-                        break; 
-                    }
-                    
-                }
-
-                if (foundAccount != null) 
-                {
-                    accounts.Remove(foundAccount);
-                    Console.WriteLine("Account Removed Successfully!");
-                    SerializationDeserialization.Serialization(accounts);
-                }
-                if (flag == 0) 
-                {
-                    Console.WriteLine("Account Not Found"); 
-                }
             }
             
+            return AccountBalance;
+        }
 
+        public void AccountDetails()
+        {
+            Console.WriteLine("----------------------------------------------------------");
+            Console.WriteLine($"| {"Account Number",-25} | {AccountNumber,25} |");
+            Console.WriteLine("----------------------------------------------------------");
+            Console.WriteLine($"| {"Bank Name",-25} | {BankName,25} |");
+            Console.WriteLine("----------------------------------------------------------");
+            Console.WriteLine($"| {"Account Holder Name",-25} | {AccountHolderName,25} |");
+            Console.WriteLine("----------------------------------------------------------");
+            Console.WriteLine($"| {"Account Balance",-25} | {AccountBalance,25} |");
+            Console.WriteLine("----------------------------------------------------------");
+            Console.WriteLine($"| {"Aadhar Number",-25} | {AadharNumber,25} |");
+            Console.WriteLine("----------------------------------------------------------");
 
         }
 
+
     }
 }
+
+
